@@ -1,0 +1,19 @@
+
+version: '3.8'  # Specify the version of the Compose file format
+
+services:
+  firebase:
+    image: firebase-tools:latest  # Use the latest Firebase tools image
+    container_name: firebase_tools  # Name the Firebase container
+    volumes:
+      - ./firebase:/workspace  # Mount the Firebase configuration directory
+    working_dir: /workspace  # Set the working directory inside the container
+    command: firebase emulators:start --import=./data --only firestore,auth  # Start Firebase emulators
+
+  flutter_app:
+    image: cirrusci/flutter:latest  # Use the latest Flutter image
+    container_name: flutter_app  # Name the Flutter application container
+    volumes:
+      - ./flutter:/workspace  # Mount the Flutter code directory
+    working_dir: /workspace  # Set the working directory inside the container
+    command: flutter run  # Command to run the Flutter application

@@ -1,0 +1,5 @@
+For this course you need to know: 
+
+Basics of programming and development (what is frontend, backend ....)
+
+Basics of git (push, pull, commit ...)

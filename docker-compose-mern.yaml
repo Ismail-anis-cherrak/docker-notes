@@ -1,0 +1,42 @@
+version: '3.8'  # Specify the version of the Compose file format
+
+services:
+  mongo:
+    image: mongo:latest  # Use the latest MongoDB image
+    container_name: mongo_db  # Name the MongoDB container
+    volumes:
+      - mongo_data:/data/db  # Persist MongoDB data
+    ports:
+      - "27017:27017"  # Map port 27017 on the host to port 27017 on the container
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root  # Set the MongoDB root username
+      MONGO_INITDB_ROOT_PASSWORD: example  # Set the MongoDB root password
+
+  backend:
+    image: node:14  # Use Node.js 14 image
+    container_name: backend  # Name the backend container
+    build:
+      context: ./backend  # Build context for the backend service
+    volumes:
+      - ./backend:/usr/src/app  # Mount the backend code to the container
+    ports:
+      - "5000:5000"  # Map port 5000 on the host to port 5000 on the container
+    working_dir: /usr/src/app  # Set the working directory inside the container
+    command: npm start  # Command to start the backend application
+    environment:
+      MONGO_URI: mongodb://root:example@mongo:27017/mydatabase  # MongoDB connection URI
+
+  frontend:
+    image: node:14  # Use Node.js 14 image
+    container_name: frontend  # Name the frontend container
+    build:
+      context: ./frontend  # Build context for the frontend service
+    volumes:
+      - ./frontend:/usr/src/app  # Mount the frontend code to the container
+    ports:
+      - "3000:3000"  # Map port 3000 on the host to port 3000 on the container
+    working_dir: /usr/src/app  # Set the working directory inside the container
+    command: npm start  # Command to start the frontend application
+
+volumes:
+  mongo_data:  # Define a volume for MongoDB data

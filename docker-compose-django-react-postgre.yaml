@@ -1,0 +1,47 @@
+version: '3.8'  # Specify the version of the Compose file format
+
+services:
+  db:
+    image: postgres:13  # Use PostgreSQL 13 image
+    container_name: postgres_db  # Name the PostgreSQL container
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # Persist PostgreSQL data
+    environment:
+      POSTGRES_DB: mydatabase  # Set the database name
+      POSTGRES_USER: user  # Set the PostgreSQL user
+      POSTGRES_PASSWORD: password  # Set the PostgreSQL password
+    ports:
+      - "5432:5432"  # Map port 5432 on the host to port 5432 on the container
+
+  backend:
+    image: python:3.9  # Use Python 3.9 image
+    container_name: django_backend  # Name the Django backend container
+    build:
+      context: ./backend  # Build context for the backend service
+    volumes:
+      - ./backend:/usr/src/app  # Mount the backend code to the container
+    ports:
+      - "8000:8000"  # Map port 8000 on the host to port 8000 on the container
+    working_dir: /usr/src/app  # Set the working directory inside the container
+    command: python manage.py runserver 0.0.0.0:8000  # Command to start Django server
+    environment:
+      - DATABASE_URL=postgres://user:password@db:5432/mydatabase  # Set the database URL
+    depends_on:
+      - db  # Ensure the database service is started before the backend
+
+  frontend:
+    image: node:14  # Use Node.js 14 image
+    container_name: react_frontend  # Name the React frontend container
+    build:
+      context: ./frontend  # Build context for the frontend service
+    volumes:
+      - ./frontend:/usr/src/app  # Mount the frontend code to the container
+    ports:
+      - "3000:3000"  # Map port 3000 on the host to port 3000 on the container
+    working_dir: /usr/src/app  # Set the working directory inside the container
+    command: npm start  # Command to start the React application
+    depends_on:
+      - backend  # Ensure the backend service is started before the frontend
+
+volumes:
+  postgres_data:  # Define a volume for PostgreSQL data
